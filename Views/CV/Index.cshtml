@@ -1,0 +1,166 @@
+﻿@model CV.Models.CV_Info
+
+@{
+    ViewData["Title"] = "Index";
+    string createDateLine(DateTime? from, DateTime? to)
+    {
+        if (from == null && to == null) return String.Empty;
+        string result = ((from != null) ? " - " + Convert.ToDateTime(from).ToShortDateString() + " " : String.Empty);
+        result += ((to != null) ? "to " + Convert.ToDateTime(to).ToShortDateString() : " to Present");
+
+        return result;
+    };
+    string createPlaceLocationLine(string place, string location)
+    {
+        if (place == String.Empty && location == String.Empty) return String.Empty;
+        string result = ((place != String.Empty) ? place : String.Empty);
+        result += (place == String.Empty) ? ((location != String.Empty) ? location : String.Empty) : ((location != String.Empty) ? ", " + location : String.Empty);
+
+        return result;
+    }
+
+    string createEducationNameLine(string field, string degree)
+    {
+        string result = (!degree.ToLower().Contains("degree")) ? degree + " Degree" : degree;
+        result += " in " + field;
+
+        return result;
+    }
+}
+
+ <style>
+    img {
+      max-width:100%;
+      max-height:100%;
+    }
+    .grid-container {
+      display: grid;
+      grid-template-columns: 30% 70%;
+      margin-top: 40px;
+    }
+
+    .dashed-line {
+      border: none;
+      height: 1px;
+      background: #000;
+      background: repeating-linear-gradient(90deg,#000,#000 6px,transparent 6px,transparent 12px);
+    }
+
+    #column1 {
+      padding-left: 40px;
+    }
+
+    #column1 {
+      padding-right: 40px;
+    }
+  </style>
+
+  <div class="grid-container">
+    <div id="column1">
+        <!--Photo-->
+        <img src="@Url.Content(Model.Photo)" alt="myPhoto" />
+        <br /> <br />
+
+        <!--Info-->
+        <p>
+            @Model.Info.Position
+            <br /> <br />
+            Phone number: @Model.Info.PhoneNumber <br />
+            Email: @Model.Info.Email <br />
+            GitHub: <a href=@Model.Info.GitHub target=”_blank”>@Model.Info.GitHub</a> 
+        </p>
+        <hr />
+
+        <!--Skills-->
+        <h1>Skills</h1>
+        <br />
+        <ul>
+            @foreach(string s in Model.Skills)
+            {
+                <li>@s</li>
+            }
+        </ul>
+        <hr />
+
+        <!--Languages-->
+        <h1>Languages</h1>
+        <br />
+        <p>
+            @foreach (Language l in Model.Languages)
+            {
+                <text>@l.LanguageName - @l.Level</text>
+            }
+        </p>
+
+    </div>
+    <div id="column2">
+
+        <!--Name, Surname-->
+        <h1>@Html.DisplayFor(model => model.Name) @Html.DisplayFor(model => model.Surname)</h1>
+        <hr />
+
+        <!--Summary-->
+        <p>
+            <h1>@Html.DisplayNameFor(model => model.Summary)</h1>
+            <br />
+            @Html.DisplayFor(model => model.Summary)
+        </p>
+        <hr />
+
+        <!--Experiance-->
+        <h1>Experiance</h1>
+        @{int i = 0;}
+        @foreach(Experiance e in Model.Experiances)
+        {   
+            <br />
+            <p>
+                <strong>@e.Name</strong> 
+                @createDateLine(e.From, e.To)
+                <br />    
+                @{
+                    string placeLocation = createPlaceLocationLine(e.Place, e.Location);
+                    if (placeLocation != String.Empty)
+                    {
+                        @placeLocation
+                        @: <br />
+                    }
+                    @e.Description
+                    if (i != Model.Experiances.Count - 1)
+                    {
+                        @: <br /> <br />
+                        @: <hr class="dashed-line" />
+                    }
+                    i++;
+                }
+            </p>
+        }
+        <br />
+        <hr />
+        
+        <!--Education-->
+        <h1>Education</h1>
+        @{
+            i = 0;
+        }
+        @foreach (Education e in Model.Educations)
+        {
+               <br />
+               <p>
+                    @createEducationNameLine(e.Field, e.Degree)
+                    @createDateLine(e.From, e.To)
+                    <br />    
+               @{
+                    <strong>@e.EducationalInstitution</strong>
+                    if (i != Model.Educations.Count - 1)
+                    {
+                        @: <br /> <br />
+                        @: <hr class="dashed-line" />
+                    }
+                    i++;
+               }
+               </p>
+        }
+        <br />
+
+    </div>
+  </div>
